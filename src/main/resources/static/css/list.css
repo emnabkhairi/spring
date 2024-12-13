@@ -1,0 +1,76 @@
+/* Sidebar Styling */
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #257443;
+  padding-top: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h5 {
+  font-size: 18px;
+  color: #495057;
+  margin-bottom: 20px;
+}
+
+.sidebar .nav-link {
+  color: #495057;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Content Area */
+.container {
+  margin-left: 270px; /* Space for sidebar */
+}
+
+/* Table Styling */
+.table-hover tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Search Bar */
+.search-bar {
+  width: 300px;
+  margin-right: 20px;
+}
+
+/* Pagination Styling */
+.pagination {
+  margin-top: 20px;
+}
+
+/* Navbar Styling */
+.navbar {
+  background-color: #343a40;
+}
+
+.navbar-brand {
+  color: white;
+}
+
+.navbar-nav .nav-link {
+  color: white;
+}
+
+.navbar-nav .nav-link.active {
+  background-color: #007bff;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  /* Make sidebar smaller on mobile */
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+  .container {
+    margin-left: 0;
+  }
+}

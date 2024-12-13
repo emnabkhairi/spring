@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Default Layout</title>
+<script type="text/javascript"></script>
+<link rel="stylesheet" th:href="@{/webjars/bootswatch/dist/minty/bootstrap.css}">
+
+
+</head>
+<body>
+    <!--Header-->
+    
+    <!--Main-->
+    <div th:replace="~{fragments/sidebar::html}"></div>
+    <div th:insert="~{::content1}"></div>
+    <!--Footer
+    <div th:replace="~{fragments/footer::footer}"></div>-->
+</body>
+</html>

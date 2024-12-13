@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Ajouter un événement</title>
+   <style>
+      html, body {
+         height: 100%;
+         margin: 0;
+         padding: 0;
+         background-color: #f7f9fc;
+      }
+
+      body {
+         display: flex;
+         flex-direction: column;
+      }
+
+      .content {
+         margin-left: 250px;
+         padding-top: 70px;
+         padding-right: 30px;
+         padding-left: 30px;
+         min-height: 100vh;
+         box-sizing: border-box;
+         background-color: #f7f9fc;
+      }
+
+      .form-container {
+         background-color: white;
+         border-radius: 8px;
+         padding: 20px;
+         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+         transform: translateY(65px);
+         margin-top: -60px;
+      }
+
+      .form-label {
+         font-weight: bold;
+         color: #333;
+      }
+
+      .form-control {
+         margin-bottom: 10px;
+      }
+
+      .form-actions {
+         margin-top: 20px;
+         text-align: center;
+      }
+
+      .btn.btn-success {
+         background-color: #b2d4cf;
+         border: none;
+      }
+
+      .btn.btn-success:hover {
+         background-color: #90c2ba;
+      }
+
+      .btn.btn-secondary {
+      background-color: #f5c6cb;
+      border: none;
+    }
+
+    .btn.btn-secondary:hover {
+      background-color: #f3a3a9;
+    }
+
+      @media (max-width: 768px) {
+         .content {
+            margin-left: 0;
+            padding: 10px;
+         }
+
+         .form-container {
+            padding: 10px;
+            transform: translateY(30px);
+         }
+      }
+   </style>
+</head>
+<body th:replace="layout/default-layout::body">
+<div class="content" th:fragment="content1">
+   <div class="form-container">
+      
+
+      <h4 class="mb-4">Ajouter un événement</h4>
+      <form th:action="@{/create}" th:object="${eventForm}" method="POST" enctype="multipart/form-data">
+         <!-- Event Name -->
+         <label for="name" class="form-label">Nom</label>
+         <input type="text" id="name" class="form-control" name="name" 
+                th:classappend="${#fields.hasErrors('name')}? 'is-invalid'" 
+                th:field="*{category}">
+         <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="invalid-feedback">Erreur sur le nom</span>
+
+         <!-- Event category -->
+         <label for="category" class="form-label">Category</label>
+         <input type="text" id="category" class="form-control" name="category" 
+                th:classappend="${#fields.hasErrors('category')}? 'is-invalid'" 
+                th:field="*{name}">
+         <span th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="invalid-feedback">Erreur sur le categorie</span>
+
+         <!-- Description -->
+         <label for="description" class="form-label">Description</label>
+         <textarea id="description" class="form-control" name="description" 
+                   th:classappend="${#fields.hasErrors('description')}? 'is-invalid'" 
+                   th:field="*{description}"></textarea>
+         <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="invalid-feedback">Erreur sur la description</span>
+
+         <!-- Date -->
+         <label for="date" class="form-label">Date</label>
+         <input type="date" id="date" class="form-control" name="date" 
+                th:classappend="${#fields.hasErrors('date')}? 'is-invalid'" 
+                th:field="*{date}">
+         <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="invalid-feedback">Erreur sur la date</span>
+
+         <!-- Available Seats -->
+         <label for="availableSeats" class="form-label">Available Seats</label>
+         <input type="number" id="availableSeats" class="form-control" name="availableSeats" 
+                th:classappend="${#fields.hasErrors('availableSeats')}? 'is-invalid'" 
+                th:field="*{availableSeats}">
+         <span th:if="${#fields.hasErrors('availableSeats')}" th:errors="*{availableSeats}" class="invalid-feedback">Erreur sur le nombre de places disponibles</span>
+
+         <!-- Location -->
+         <label for="location" class="form-label">Location</label>
+         <input type="text" id="location" class="form-control" name="location" 
+                th:classappend="${#fields.hasErrors('location')}? 'is-invalid'" 
+                th:field="*{location}">
+         <span th:if="${#fields.hasErrors('location')}" th:errors="*{location}" class="invalid-feedback">Erreur sur le lieu</span>
+
+         <!-- Price -->
+         <label for="price" class="form-label">Price</label>
+         <input type="number" id="price" class="form-control" name="price" 
+                th:classappend="${#fields.hasErrors('price')}? 'is-invalid'" 
+                th:field="*{price}" step="0.01">
+         <span th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="invalid-feedback">Erreur sur le prix</span>
+
+         <!-- Image Upload -->
+         <label for="file" class="form-label">Photo</label>
+         <input type="file" id="file" class="form-control" name="file">
+
+         <!-- Submit Button -->
+         <div class="form-actions">
+            <input class="btn btn-success" type="submit" value="Enregistrer">
+            <a th:href="@{/events}" class="btn btn-secondary">Cancel</a>
+         </div>
+      </form>
+   </div>
+</div>
+</body>
+</html>

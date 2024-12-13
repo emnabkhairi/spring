@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f9fc;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      margin-top: -30px;
+    }
+
+    .content {
+      margin-left: 250px;
+      padding: 30px;
+      background-color: #f7f9fc;
+      min-height: 92vh;
+    }
+
+    .header-section {
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header-section h1 {
+      font-size: 2rem;
+      color: #333;
+      margin: 0;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .search-bar input {
+      width: 300px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 25px;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .search-bar input:focus {
+      box-shadow: 0 0 5px rgba(135, 216, 178, 0.781);
+    }
+
+    .search-bar button {
+      position: absolute;
+      right: 10px;
+      border: none;
+      background-color: transparent;
+      color: #90c2ba;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .event-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+      margin-left: 45px;
+    }
+
+    .event-card {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      width: 280px;
+      text-align: center;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .event-card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      object-fit: cover;
+      border: 3px solid #90c2ba;
+    }
+
+    .event-title {
+      font-size: 1.2rem;
+      color: #333;
+      font-weight: bold;
+      margin: 0 0 10px;
+    }
+
+    .event-description {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .event-details {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .event-details span {
+      font-weight: bold;
+    }
+
+    .btn-participate {
+      background-color: #b2d4cf; 
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-participate:hover {
+      background-color: #90c2ba;
+    }
+
+    nav {
+      margin-top: 30px;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: #b2d4cf;
+      border-color: #c7b3e5;
+    }
+
+    .pagination .page-item .page-link:hover {
+      background-color: #90c2ba;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        margin-left: 0;
+        padding: 10px;
+      }
+
+      .event-card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body th:replace="layout/default-layout::body">
+
+  <div class="content" th:fragment="content1">
+    <div class="header-section">
+      <h1>Events</h1>
+      <form class="search-bar" th:action="@{/events/search}" method="get">
+        <input type="text" name="query" placeholder="Search events..." th:value="${query}">
+        <button type="submit"><i class="fa fa-search" style="color: #90c2ba;"></i></button>
+      </form>
+    </div>
+
+    <div class="event-cards">
+      <div class="event-card" th:each="event : ${events}">
+        <h5 class="event-title" th:text="${event.category}"></h5>
+        <img th:src="(${event.image}?@{|images/${event.image}|}:@{'images/no-image.png'})" alt="Event Image">
+
+        <h5 class="event-title" th:text="${event.name}"></h5>
+
+        <p class="event-description" th:text="${event.description}"></p>
+
+        <div class="event-details">
+          <p><span>Date:</span> <span th:text="${event.date}"></span></p>
+          <p><span>Location:</span> <span th:text="${event.location}"></span></p>
+          <p><span>Seats:</span> <span th:text="${event.availableSeats}"></span></p>
+          <p><span>Fee:</span> <span th:text="${event.price}"></span></p>
+        </div>
+
+        <a th:href="@{/participants/create}" class="btn-participate">Participate in the Event</a>
+      </div>
+    </div>
+
+    <nav>
+        <ul class="pagination justify-content-end">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="#">2</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+  </div>
+</body>
+</html>

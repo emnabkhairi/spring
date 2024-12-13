@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Register For An Event</title>
+   <style>
+      html, body {
+         height: 100%;
+         margin: 0;
+         padding: 0;
+         background-color: #f7f9fc;
+      }
+
+      body {
+         display: flex;
+         flex-direction: column;
+      }
+
+      .content {
+         margin-left: 250px;
+         padding-top: 70px;
+         padding-right: 30px;
+         padding-left: 30px;
+         
+         min-height: 100vh;
+         box-sizing: border-box;
+         background-color: #f7f9fc;
+      }
+
+      .form-container {
+         background-color: white;
+         border-radius: 8px;
+         padding: 20px;
+         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+         transform: translateY(65px);
+         margin-top: -60px;
+      }
+
+      .form-label {
+         font-weight: bold;
+         color: #333;
+      }
+
+      .form-control {
+         margin-bottom: 10px;
+      }
+
+      .form-actions {
+         margin-top: 20px;
+         text-align: center;
+      }
+
+      .btn.btn-success {
+         background-color: #b2d4cf;
+         border: none;
+      }
+
+      .btn.btn-success:hover {
+         background-color: #90c2ba;
+      }
+
+      .btn.btn-secondary {
+      background-color: #f5c6cb;
+      border: none;
+    }
+
+    .btn.btn-secondary:hover {
+      background-color: #f3a3a9;
+    }
+
+      @media (max-width: 768px) {
+         .content {
+            margin-left: 0;
+            padding: 10px;
+         }
+
+         .form-container {
+            padding: 10px;
+            transform: translateY(30px);
+         }
+      }
+   </style>
+</head>
+<body th:replace="layout/default-layout::body">
+<div class="content" th:fragment="content1">
+   <div class="form-container">
+      
+
+      <h4 class="mb-4">Register For An Event</h4>
+      <form th:action="@{/createParticipant}" th:object="${participantForm}" method="POST" enctype="multipart/form-data">
+         <!-- first Name -->
+        
+         <label for="firstName" class="form-label">First Name</label>
+         <input type="text" id="firstName" class="form-control" name="firstName" 
+                   th:classappend="${#fields.hasErrors('firstName')}? 'is-invalid'" 
+                   th:field="*{firstName}">
+         <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="invalid-feedback">Erreur sur la firstName</span>
+
+         <!-- lastName -->
+         <label for="lastName" class="form-label">Last Name</label>
+         <input type="text" id="lastName" class="form-control" name="lastName" 
+                   th:classappend="${#fields.hasErrors('lastName')}? 'is-invalid'" 
+                   th:field="*{lastName}">
+         <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="invalid-feedback">Erreur sur la lastName</span>
+
+         <!-- birthday -->
+         <label for="birthday" class="form-label">Date Of Birth </label>
+         <input type="date" id="birthday" class="form-control" name="birthday" 
+                th:classappend="${#fields.hasErrors('birthday')}? 'is-invalid'" 
+                th:field="*{birthday}">
+         <span th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}" class="invalid-feedback">Erreur sur la birthday</span>
+
+         <!-- email -->
+         <label for="email" class="form-label">Email</label>
+         <input type="email" id="email" class="form-control" name="email" 
+                th:classappend="${#fields.hasErrors('email')}? 'is-invalid'" 
+                th:field="*{email}">
+         <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid-feedback">Erreur sur lemail</span>
+
+         <!-- number -->
+         <label for="number" class="form-label">Phone Number</label>
+         <input type="number" id="number" class="form-control" name="number" 
+                th:classappend="${#fields.hasErrors('number')}? 'is-invalid'" 
+                th:field="*{number}">
+         <span th:if="${#fields.hasErrors('number')}" th:errors="*{number}" class="invalid-feedback">Erreur sur le number</span>
+
+         <!-- Image Upload -->
+         <label for="file" class="form-label">Photo</label>
+         <input type="file" id="file" class="form-control" name="file">
+
+         <!-- Submit Button -->
+         <div class="form-actions">
+            <input class="btn btn-success" type="submit" value="Register">
+            <a th:href="@{/AllEvents}" class="btn btn-secondary">Cancel</a>
+         </div>
+      </form>
+   </div>
+</div>
+</body>
+</html>
