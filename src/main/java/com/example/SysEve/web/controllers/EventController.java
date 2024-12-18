@@ -5,13 +5,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import com.example.SysEve.business.services.EventService;
 import com.example.SysEve.dao.entities.Event;
 import com.example.SysEve.web.models.requests.EventForm;
-
+import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -27,14 +28,21 @@ import org.springframework.web.multipart.MultipartFile;
 public class EventController {
 
     
-    public static String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/images";
+    public static String uploadDirectory = System.getProperty("user.home") + "/SysEve/uploads";
     
 
     private final EventService eventService;
 
-    @RequestMapping({"/", "/events"})
-     public String getAllEvents(Model model) {
-        model.addAttribute("events", this.eventService.getAllEvent());
+    @RequestMapping({ "/events"})
+     public String getAllEvents(@RequestParam(defaultValue = "0") int page,
+     @RequestParam(defaultValue = "7") int pageSize,
+     Model model) {
+        Page<Event> eventPage = this.eventService.getAllEventPagination(PageRequest.of(page, pageSize));
+        model.addAttribute("events", eventPage.getContent());
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", eventPage.getTotalPages()); 
+
          return  "test";
      }
 
@@ -50,56 +58,48 @@ public class EventController {
 
 
 
- @RequestMapping(path = "/create", method = RequestMethod.POST)
-    public String addEvent(
-        @Valid @ModelAttribute EventForm eventForm,
-        BindingResult bindingResult,
-        Model model,
-        @RequestParam MultipartFile file) {
+    @RequestMapping(path = "/create", method = RequestMethod.POST)
+public String addEvent(
+    @Valid @ModelAttribute EventForm eventForm,
+    BindingResult bindingResult,
+    Model model,
+    @RequestParam MultipartFile file
+) {
+    if (bindingResult.hasErrors()) {
+        model.addAttribute("error", "Invalid data");
+        return "add-event";
+    }
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "Données invalides");
+    String fileName = null;
+
+    if (!file.isEmpty()) {
+        fileName = file.getOriginalFilename();
+        Path newFilePath = Paths.get(uploadDirectory, fileName);
+
+        try {
+            Files.createDirectories(Paths.get(uploadDirectory)); 
+            Files.write(newFilePath, file.getBytes());          
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "File upload failed");
             return "add-event";
         }
-
-        if (!file.isEmpty()) {
-            StringBuilder fileName = new StringBuilder();
-            fileName.append(file.getOriginalFilename());
-            Path newFilePath = Paths.get(uploadDirectory, fileName.toString());
-
-            try {
-                Files.write(newFilePath, file.getBytes());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            this.eventService.addEvent(new Event(
-                null,
-                eventForm.getName(),
-                eventForm.getCategory(),
-                eventForm.getDescription(),
-                eventForm.getDate(),
-                eventForm.getLocation(),
-                eventForm.getAvailableSeats(),
-                eventForm.getPrice(),
-                fileName.toString()
-            ));
-        } else {
-            this.eventService.addEvent(new Event(
-                null,
-                eventForm.getName(),
-                eventForm.getCategory(),
-                eventForm.getDescription(),
-                eventForm.getDate(),
-                eventForm.getLocation(),
-                eventForm.getAvailableSeats(),
-                eventForm.getPrice(),
-                null
-            ));
-        }
-
-        return "redirect:/events";
     }
+
+    this.eventService.addEvent(new Event(
+        null,
+        eventForm.getName(),
+        eventForm.getCategory(),
+        eventForm.getDescription(),
+        eventForm.getDate(),
+        eventForm.getLocation(),
+        eventForm.getAvailableSeats(),
+        eventForm.getPrice(),
+        fileName
+    ));
+
+    return "redirect:/events";
+}
 
 
 
@@ -171,26 +171,24 @@ public String updateEvent(
 
     @RequestMapping(path = "/events/{id}/delete", method = RequestMethod.POST)
     public String deleteEventById(@PathVariable Long id) {
-    Event event = this.eventService.getEventById(id);
-
     
-    if (event != null && event.getImage() != null) {
-        Path filePath = Paths.get(uploadDirectory, event.getImage());
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     this.eventService.deleteEventById(id);
     return "redirect:/events";
 }
 
-@RequestMapping({"/AllEvents"})
-     public String getAllEventsClient(Model model) {
-        model.addAttribute("events", this.eventService.getAllEvent());
+@RequestMapping({"/", "/AllEvents"})
+     public String getAllEventsClient(@RequestParam(defaultValue = "0") int page,
+     @RequestParam(defaultValue = "10") int pageSize,
+     Model model) {
+        Page<Event> eventPage = this.eventService.getAllEventPagination(PageRequest.of(page, pageSize));
+        model.addAttribute("events", eventPage.getContent());
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", eventPage.getTotalPages()); 
+
          return  "events";
+
      }
 
      @RequestMapping("/AllEvents/create")
@@ -199,7 +197,44 @@ public String updateEvent(
          return "inscription";
      }
 
+
+
+     @RequestMapping(path = "/events/search", method = RequestMethod.GET)
+    public String searchEventsByNameOrCategory(
+        @RequestParam(value = "query", required = false) String query,
+        @RequestParam(value = "page", required = false, defaultValue = "0") String page,  // Keep as String
+        @RequestParam(value = "pageSize", required = false, defaultValue = "7") int pageSize,
+        Model model) {
+
+    int currentPage = 0;  // Default to 0 if invalid input
+
+    try {
+        currentPage = Integer.parseInt(page);  // Try to parse the page as an integer
+    } catch (NumberFormatException e) {
+        // If it fails, the page will remain as 0 (or you could log the error)
+    }
+
+    // Fetch events matching the query with pagination
+    Page<Event> eventPage = (query == null || query.trim().isEmpty()) 
+            ? eventService.getAllEventPagination(PageRequest.of(currentPage, pageSize))  // Fetch all events if query is empty
+            : eventService.searchEventsWithPagination(query, PageRequest.of(currentPage, pageSize));  // Add pagination for search
+    
+    // Add data to the model
+    model.addAttribute("events", eventPage.getContent());
+    model.addAttribute("pageSize", pageSize);
+    model.addAttribute("currentPage", currentPage);
+    model.addAttribute("totalPages", eventPage.getTotalPages());
+    model.addAttribute("searchQuery", query);
+
+    // Return the appropriate view
+    return page;  // Use the same view as for normal events listing
 }
+
+
+}
+
+
+
 
 
 

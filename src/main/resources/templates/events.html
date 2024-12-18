@@ -20,8 +20,10 @@
     }
 
     .content {
-      margin-left: 250px;
-      padding: 30px;
+      padding-left: 280px;
+      padding-top: 30px;
+      padding-right: 30px;
+      padding-bottom: 30px;
       background-color: #f7f9fc;
       min-height: 92vh;
     }
@@ -176,32 +178,36 @@
     <div class="header-section">
       <h1>Events</h1>
       <form class="search-bar" th:action="@{/events/search}" method="get">
-        <input type="text" name="query" placeholder="Search events..." th:value="${query}">
+        <input type="text" name="query" placeholder="Search events..." th:value="${searchQuery}">
         <button type="submit"><i class="fa fa-search" style="color: #90c2ba;"></i></button>
+        <input type="hidden" name="page" value="events">
       </form>
     </div>
 
     <div class="event-cards">
+      <div th:if="${#lists.isEmpty(events)}" >
+        <h5 colspan="9" class="text-center">No events found with the name "<span th:text="${searchQuery}"></span>".</h5>
+      </div>
       <div class="event-card" th:each="event : ${events}">
         <h5 class="event-title" th:text="${event.category}"></h5>
-        <img th:src="(${event.image}?@{|images/${event.image}|}:@{'images/no-image.png'})" alt="Event Image">
+
+        <img th:src="${event.image != null ? '/images/' + event.image : '/images/no-image.png'}"
+          alt="Event Image" class="img-rounded img-responsive">
 
         <h5 class="event-title" th:text="${event.name}"></h5>
-
         <p class="event-description" th:text="${event.description}"></p>
-
         <div class="event-details">
           <p><span>Date:</span> <span th:text="${event.date}"></span></p>
           <p><span>Location:</span> <span th:text="${event.location}"></span></p>
           <p><span>Seats:</span> <span th:text="${event.availableSeats}"></span></p>
-          <p><span>Fee:</span> <span th:text="${event.price}"></span></p>
+          <p><span>Participation Fee:</span> <span th:text="${event.price}"></span></p>
         </div>
 
         <a th:href="@{/participants/create}" class="btn-participate">Participate in the Event</a>
       </div>
     </div>
 
-    <nav>
+    <!-- <nav>
         <ul class="pagination justify-content-end">
             <li class="page-item disabled">
                 <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
@@ -215,7 +221,26 @@
                 <a class="page-link" href="#">Next</a>
             </li>
         </ul>
-    </nav>
+    </nav> -->
+
+    <nav>
+      <ul class="pagination justify-content-end">
+        <li class="page-item" th:classappend="${currentPage==0?'disabled':''}">
+          <a class="page-link" th:href="@{|/AllEvents?page=${currentPage-1}|}">&laquo;</a>
+        </li>
+        <li th:each="index: ${#numbers.sequence(0,totalPages -1)}" class="page-item"
+            th:classappend="${currentPage==index ?'active':''}">
+          <a class="page-link"th:href="@{|/AllEvents?page=${index}|}" th:text="${index+1}"></a>
+        </li> 
+        <li class="page-item"  th:classappend="${currentPage== totalPages -1?'disabled':''}">
+          <a class="page-link" th:href="@{|/AllEvents?page=${currentPage+1}|}">&raquo;</a>
+        </li>
+      </ul>
+    </nav> 
+     
+
+
+
   </div>
 </body>
 </html>

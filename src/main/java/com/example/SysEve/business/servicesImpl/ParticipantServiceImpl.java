@@ -2,6 +2,8 @@ package com.example.SysEve.business.servicesImpl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.SysEve.business.services.ParticipantService;
@@ -30,10 +32,7 @@ public class ParticipantServiceImpl implements ParticipantService{
        return this.participantRepository.findById(id).get();
     }
 
-    @Override
-    public List<Participant> getParticipantByName(String name) {
-        return this.participantRepository.findByFirstName(name);
-    }
+    
 
     @Override
     public Participant addParticipant(Participant event) {
@@ -52,6 +51,20 @@ public class ParticipantServiceImpl implements ParticipantService{
          this.participantRepository.deleteById(id);
     }
 
+    @Override
+    public Page<Participant> getAllParticipantPagination(Pageable pegeable) {
+        if(pegeable ==null){
+            return null;
+        }
+        return this.participantRepository.findAll(pegeable);
+
+    }
+    
+    @Override
+    public Page<Participant> searchParticipants(String query, Pageable pageable) {
+        return this.participantRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            query, query, query, pageable);
+    }
     
     
 }

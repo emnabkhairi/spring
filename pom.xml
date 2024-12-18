@@ -51,6 +51,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
 
 	<!-- https://mvnrepository.com/artifact/org.webjars/bootstrap -->
 		<dependency>
@@ -97,6 +102,16 @@
     <artifactId>jakarta.validation-api</artifactId>
     <version>3.0.2</version> <!-- Use the latest version -->
 </dependency>
+
+		<dependency>
+ 			<groupId>org.thymeleaf.extras</groupId>
+ 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+ 			<version>3.1.1.RELEASE</version>
+ 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 
 	</dependencies>
 

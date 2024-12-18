@@ -138,11 +138,20 @@ body {
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Events</h4>
             <a th:href="@{/events/create}" class="btn btn-add"><i class="fas fa-plus"></i> Add Event</a>
+
+            
+
         </div>
 
         <!-- Search Bar -->
         <div class="mb-3">
-            <input type="text" class="form-control search-bar" placeholder="Search events...">
+            <form th:action="@{/events/search}" method="get" class="d-flex">
+                <!-- Single input for both name and category -->
+                <input type="text" name="query" class="form-control search-bar" 
+                       th:value="${searchQuery}" placeholder="Search events by name or category..."
+                       onkeydown="if(event.key === 'Enter'){this.form.submit();}">
+                       <input type="hidden" name="page" value="test">
+            </form>
         </div>
 
         <!-- Table -->
@@ -162,9 +171,15 @@ body {
                     </tr>
                 </thead>
                 <tbody>
+                    
+                
+
                     <tr th:each="event : ${events}">
-                        <td><img th:src="(${event.image}?@{|images/${event.image}|}:@{'images/no-image.png'})" alt="photo"
-                          class="img-rounded img-responsive" style="max-height: 50px; max-width: 50px;"></td>
+                        <td>
+                            <img th:src="${event.image != null ? '/images/' + event.image : '/images/no-image.png'}"
+                            alt="photo" class="img-rounded img-responsive"
+                            style="max-height: 50px; max-width: 50px;">
+                        </td>
                         <td th:text="${event.name}"></td>
                         <td th:text="${event.category}"></td>
                         <td th:text="${event.description}"></td>
@@ -184,10 +199,13 @@ body {
                     </tr>
                 </tbody>
             </table>
+            <div class="alert alert-warning" th:if="${#lists.isEmpty(events)}">
+                No event found !
+              </div>
         </div>
 
         <!-- Pagination (Optional) -->
-        <nav>
+        <!-- <nav>
             <ul class="pagination justify-content-end">
                 <li class="page-item disabled">
                     <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
@@ -201,7 +219,26 @@ body {
                     <a class="page-link" href="#">Next</a>
                 </li>
             </ul>
+        </nav> -->
+
+
+        <nav>
+          <ul class="pagination justify-content-end">
+            <li class="page-item" th:classappend="${currentPage==0?'disabled':''}">
+              <a class="page-link" th:href="@{|/events?page=${currentPage-1}|}">&laquo;</a>
+            </li>
+            <li th:each="index: ${#numbers.sequence(0,totalPages -1)}" class="page-item"
+                th:classappend="${currentPage==index ?'active':''}">
+              <a class="page-link"th:href="@{|/events?page=${index}|}" th:text="${index+1}"></a>
+            </li> 
+            <li class="page-item"  th:classappend="${currentPage== totalPages -1?'disabled':''}">
+              <a class="page-link" th:href="@{|/events?page=${currentPage+1}|}">&raquo;</a>
+            </li>
+          </ul>
         </nav>
+
+
+
     </div>
 </div>
 </body>

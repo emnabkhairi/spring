@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Events</title>
+  <title>Participants</title>
   <style>
     html, body {
     height: 100%;
@@ -106,6 +106,16 @@ body {
     max-width: 300px;
 }
 
+.alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .content {
@@ -133,7 +143,12 @@ body {
 </head>
 <body th:replace="layout/default-layout::body">
 <div class="content" th:fragment="content1">
-    <div class="table-container">
+    <!-- If not authenticated, show the success message -->
+<div th:if="${!isAdmin}" class="alert alert-success">
+    Your restoration request has been successfully completed! The event organizer will contact you shortly with more details.
+</div>
+
+    <div class="table-container" th:if="${isAdmin}">
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Participants</h4>
@@ -142,7 +157,11 @@ body {
 
         <!-- Search Bar -->
         <div class="mb-3">
-            <input type="text" class="form-control search-bar" placeholder="Search participants...">
+            <form method="get" class="d-flex">
+                <input type="text" name="searchQuery" class="form-control search-bar" 
+                       placeholder="Search participants by name or email..." 
+                       th:value="${searchQuery}">
+            </form>
         </div>
 
         <!-- Table -->
@@ -161,9 +180,13 @@ body {
                     </tr>
                 </thead>
                 <tbody>
+                     
                     <tr th:each="participant : ${participants}">
-                        <td><img th:src="(${participant.image}?@{|images/${participant.image}|}:@{'images/no-image.png'})" alt="photo"
-                          class="img-rounded img-responsive" style="max-height: 50px; max-width: 50px;"></td>
+                        <td>
+                            <img th:src="${participant.image != null ? '/images/' + participant.image : '/images/no-image.png'}"
+                            alt="Participant's profile photo" class="img-rounded img-responsive"
+                            style="max-height: 50px; max-width: 50px;">
+                        </td>
                         <td th:text="${participant.firstName}"></td>
                         <td th:text="${participant.lastName}"></td>
                         <td th:text="${participant.birthday}"></td>
@@ -174,31 +197,33 @@ body {
                         </td>
                         <!-- <td><span class="status-dot" [ngClass]="{'status-active': employee.status === 'active', 'status-inactive': employee.status === 'inactive'}"></span> {{ employee.status }}</td> -->
                         <td>
-                            <form class="col-8" th:action="@{|/participants/${participant.id}/delete|}" method="Post">
-                            <button method="Post" type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                            <form class="col-8" th:action="@{|/participants/${participant.id}/delete|}" method="post">
+                            <button method="post" type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                           </form>
                           </td>
                     </tr>
                 </tbody>
             </table>
+            <div class="alert alert-warning" th:if="${#lists.isEmpty(participants)}">
+                No participant found !
+              </div>
         </div>
 
         <!-- Pagination (Optional) -->
         <nav>
             <ul class="pagination justify-content-end">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
+              <li class="page-item" th:classappend="${currentPage==0?'disabled':''}">
+                <a class="page-link" th:href="@{|/participants?page=${currentPage-1}|}">&laquo;</a>
+              </li>
+              <li th:each="index: ${#numbers.sequence(0,totalPages -1)}" class="page-item"
+                  th:classappend="${currentPage==index ?'active':''}">
+                <a class="page-link"th:href="@{|/participants?page=${index}|}" th:text="${index+1}"></a>
+              </li> 
+              <li class="page-item"  th:classappend="${currentPage== totalPages -1?'disabled':''}">
+                <a class="page-link" th:href="@{|/participants?page=${currentPage+1}|}">&raquo;</a>
+              </li>
             </ul>
-        </nav>
+          </nav>
     </div>
 </div>
 </body>

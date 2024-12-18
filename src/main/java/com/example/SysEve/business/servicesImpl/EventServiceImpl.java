@@ -2,11 +2,14 @@ package com.example.SysEve.business.servicesImpl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.SysEve.business.services.EventService;
 import com.example.SysEve.dao.entities.Event;
 import com.example.SysEve.dao.repositories.EventRepository;
+
 
 @Service
 public class EventServiceImpl implements EventService{
@@ -30,10 +33,11 @@ public class EventServiceImpl implements EventService{
        return this.eventRepository.findById(id).get();
     }
 
-    @Override
-    public List<Event> getEventByName(String name) {
-        return this.eventRepository.findByName(name);
+
+    public Page<Event> searchEventsWithPagination(String query, Pageable pageable) {
+        return eventRepository.findByNameContainingOrCategoryContaining(query, query, pageable);
     }
+    
 
     @Override
     public Event addEvent(Event event) {
@@ -58,5 +62,17 @@ public class EventServiceImpl implements EventService{
         }
          this.eventRepository.deleteById(id);
     }
+
+    @Override
+    public Page<Event> getAllEventPagination(Pageable pegeable) {
+        if(pegeable ==null){
+            return null;
+        }
+        return this.eventRepository.findAll(pegeable);
+
+      
+    }
+
+    
     
 }

@@ -14,6 +14,7 @@
         /* Sidebar Styling */
 /* Sidebar Styling */
 .sidebar {
+    
     width: 250px;
     height: 100vh;
     background-color: #f8f9fa;
@@ -26,6 +27,7 @@
 }
 
 .sidebar .brand {
+    padding-bottom: 20px;
     font-weight: bold;
     font-size: 1.5rem;
     color: #333;
@@ -35,6 +37,7 @@
 }
 
 .sidebar ul {
+
     list-style: none;
     padding: 0;
     margin: 0;
@@ -69,7 +72,9 @@
     margin-top: auto;
 }
 
-.sidebar .upgrade-btn {
+.btn-success {
+    margin-left: 10px;
+    margin-top: 10px;
     
     color: #fff;
     text-align: center;
@@ -79,13 +84,39 @@
     transition: background-color 0.3s;
     cursor: pointer;
     background-color: #b2d4cf;
-    color: #ffffff;
+    color: #3e5f5a;
+    border: none; /* Remove the border */
 }
 
-.sidebar .upgrade-btn:hover {
+.btn-success2 {
+    margin-top: 10px;
+    color: #ffffff; /* Text color */
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s, opacity 0.3s;
+    cursor: pointer;
+    background-color: transparent; /* Make the button transparent */
+   
+    opacity: 0.8; /* Slightly transparent */
+}
+
+
+.col{
+    margin-left: 20px;
+    margin-top: 50px;
+}
+
+.btn-success:hover {
     
     background-color: #90c2ba;
     color: #3e5f5a;
+}
+.btn-success2:hover {
+    background-color: #90c2ba; /* Add a background color on hover */
+    color: #fff;
+    opacity: 1; /* Fully opaque on hover */
 }
 
 
@@ -98,10 +129,32 @@
 .navbar-brand span {
     color: #b2d4cf;
 }
-.active {
-    font-weight: bold;
-    color: #b2d4cf;
-  }
+.sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 1rem;
+        }
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar ul li a i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        .sidebar ul li a.active,
+        .sidebar ul li a:hover {
+            background-color: #b2d4cf;
+            color: #3e5f5a;
+        }
 
 
     </style>
@@ -113,28 +166,62 @@
     <div class="sidebar">
         <!-- Brand -->
         
-        <div class="brand" ><a class="navbar-brand" href="#">
+        <div class="brand" ><a class="navbar-brand" href="/">
             <i class="fas fa-rocket"></i> SyS<span>Event</span>
         </a></div>
 
         <!-- Menu -->
         <ul>
-            <li><a href="/AllEvents"><i class="fas fa-tachometer-alt"></i> Home </a></li>
-            <li><a class="active" href="/events"><i class="fas fa-users"></i> Events </a></li>
-            <li><a href="/participants"><i class="fas fa-handshake"></i> Participants </a></li>
-            <li><a href="#"><i class="fas fa-project-diagram"></i> participants </a></li>
-            <li><a href="#"><i class="fas fa-users-cog"></i> Teams</a></li>
-            <li><a href="#"><i class="fas fa-comment-dots"></i> Feedbacks</a></li>
-            <li><a href="#"><i class="fas fa-th"></i> Table</a></li>
-            <li><a href="#"><i class="fas fa-info-circle"></i> About</a></li>
+            <li><a href="/" id="home-link"><i class="fas fa-home"></i> Home</a></li>
+            <li  sec:authorize="isAuthenticated()"><a href="/events" id="events-link" ><i class="fas fa-calendar-alt"></i> Events</a></li>
+            <li  sec:authorize="isAuthenticated()"><a href="/participants" id="participants-link"><i class="fas fa-users"></i> Participants</a></li>
+
+        </ul>
+            
+                      <!--logout form for logged users-->
+          <ul class="navbar-nav ms-auto me-4" sec:authorize="isAuthenticated()">
+            <!-- <ul class="navbar-nav ms-auto me-4"> -->
+            <li class="nav-item">
+              <form th:action="@{/logout}" method="post" class="row">
+                <div class="col">
+                  <span class="text-secondary" sec:authentication="name"></span>
+                  <span class="text-secondary" sec:authentication="principal.authorities">ROLE</span>
+                </div>
+                
+                <input type="submit" value="Logout" class="btn btn-lg btn-success w-100" />
+            </form>
+            </li>
           </ul>
+          <!--login form for unlogged users-->
+          <ul class="navbar-nav" sec:authorize="!isAuthenticated()">
+            <li class="nav-item">
+              <form th:action="@{/login}" method="get" >
+                <input type="submit" value="Login ( Admin Only)" class="btn btn-lg btn-success2 " />
+              </form>
+            </li>
+        </ul>
           
 
-        <!-- Upgrade Button -->
-        <span  class="upgrade-btn" >
-            <i ></i> Sign Out 
-        </span>
+
     </div>
+
+    <script>
+        // Get the current path
+        const path = window.location.pathname;
+
+        // Remove the 'active' class from all links
+        const links = document.querySelectorAll('.sidebar ul li a');
+        links.forEach(link => link.classList.remove('active'));
+
+        // Add 'active' class to the current link
+        if (path === '/') {
+            document.getElementById('home-link').classList.add('active');
+        } else if (path === '/events') {
+            document.getElementById('events-link').classList.add('active');
+        } else if (path === '/participants') {
+            document.getElementById('participants-link').classList.add('active');
+        }
+    </script>
 
     <!-- Optional Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
